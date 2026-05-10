@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>OFICINA TÉCNICA - HG · Seguimiento de Proyectos y ETOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0f4f9; font-family: 'Inter', sans-serif; color: #1e2f3f; }
+        .app-container { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #1a3a4f 0%, #1e4d6b 100%);
+            padding: 1.2rem 2rem;
+            border-radius: 28px;
+            color: white;
+        }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-icon { background: rgba(255,255,255,0.2); width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 16px; font-size: 1.8rem; }
+        .logo-text h1 { font-size: 1.4rem; font-weight: 700; }
+        .logo-text .subtitle { font-size: 0.7rem; opacity: 0.85; }
+        .admin-control { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .btn-admin { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 18px; border-radius: 40px; cursor: pointer; font-weight: 500; }
+        .admin-badge { background: #10b981; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+        .viewer-badge { background: #6b7280; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+
+        .tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .tab-btn { background: transparent; border: none; padding: 0.8rem 1.8rem; font-size: 1rem; font-weight: 600; cursor: pointer; color: #6b7280; border-radius: 40px; display: flex; align-items: center; gap: 8px; }
+        .tab-btn.active { background: #1e4d6b; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card { background: white; border-radius: 20px; padding: 0.8rem 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2edf2; }
+        .stat-title { font-size: 0.65rem; text-transform: uppercase; color: #5c6f87; margin-bottom: 4px; }
+        .stat-number { font-size: 1.6rem; font-weight: 700; color: #1e4d6b; }
+
+        .actions-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.5rem; }
+        .btn-primary { background: #1e4d6b; border: none; color: white; font-weight: 600; padding: 8px 18px; border-radius: 40px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+        .btn-success { background: #10b981; }
+        .btn-warning { background: #f59e0b; }
+        .btn-secondary { background: #eef2f9; color: #1e2f3f; }
+        .filter-group { background: white; padding: 4px 8px; border-radius: 48px; border: 1px solid #e2edf2; display: flex; gap: 6px; }
+        .filter-btn { background: transparent; border: none; padding: 5px 12px; border-radius: 32px; font-weight: 500; cursor: pointer; font-size: 0.7rem; }
+        .filter-btn.active { background: #1e4d6b; color: white; }
+        .search-box { background: white; border-radius: 40px; padding: 5px 14px; display: flex; align-items: center; gap: 8px; border: 1px solid #e2edf2; }
+        .search-box input { border: none; outline: none; width: 150px; font-size: 0.8rem; }
+
+        .projects-table { background: white; border-radius: 24px; border: 1px solid #e9eff5; overflow-x: auto; }
+        .project-header { display: grid; grid-template-columns: 1.5fr 0.7fr 0.9fr 0.9fr 0.7fr 1fr 0.7fr; background: #fafcff; padding: 0.8rem 1rem; border-bottom: 1px solid #e9eff5; font-weight: 600; font-size: 0.7rem; }
+        .project-row { display: grid; grid-template-columns: 1.5fr 0.7fr 0.9fr 0.9fr 0.7fr 1fr 0.7fr; align-items: center; padding: 0.8rem 1rem; border-bottom: 1px solid #f0f4fa; cursor: pointer; }
+        .project-row:hover { background: #f8fafd; }
+        .priority-badge { padding: 3px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; width: fit-content; }
+        .priority-1 { background: #fecaca; color: #991b1b; }
+        .priority-2 { background: #fed7aa; color: #9a3412; }
+        .priority-3 { background: #d1fae5; color: #065f46; }
+        .status-badge { padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; width: fit-content; }
+        .status-progress { background: #fed7aa; color: #9a3412; }
+        .status-completed { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fee2e2; color: #991b1b; }
+        .progress-bar-wrap { background: #e9eef4; border-radius: 20px; height: 6px; width: 80%; overflow: hidden; }
+        .progress-fill { background: #1e4d6b; width: 0%; height: 100%; border-radius: 20px; }
+
+        .detail-row { display: none; grid-column: 1 / -1; background: #f9fbfe; padding: 1rem; border-top: 1px solid #e9eff5; }
+        .detail-row.open { display: block; }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; margin-bottom: 1rem; padding-bottom: 0.8rem; border-bottom: 1px solid #e2e8f0; }
+
+        /* Tabla de ETOS mejorada */
+        .lamina-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        .lamina-table th, .lamina-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.8rem; }
+        .lamina-table th { background: #f1f5f9; font-weight: 600; color: #1e4d6b; }
+        .lamina-status { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; display: inline-block; }
+        .lamina-status.pendiente { background: #fee2e2; color: #991b1b; }
+        .lamina-status.progreso { background: #fed7aa; color: #9a3412; }
+        .lamina-status.terminado { background: #d1fae5; color: #065f46; }
+        .action-icon { margin: 0 4px; cursor: pointer; color: #6b7280; }
+        .action-icon:hover { color: #1e4d6b; }
+
+        .organigrama-container {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid #e9eff5;
+        }
+        .org-title { text-align: center; font-size: 1.5rem; font-weight: 700; color: #1e4d6b; margin-bottom: 2rem; }
+        .org-jefe { text-align: center; margin-bottom: 2rem; }
+        .org-jefe-card { background: linear-gradient(135deg, #1e4d6b, #1a3a4f); color: white; display: inline-block; padding: 1rem 2rem; border-radius: 20px; text-align: center; }
+        .org-heads-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-top: 1rem; }
+        .org-head-card { background: #f1f5f9; border-radius: 20px; padding: 1rem; min-width: 300px; border-left: 4px solid #1e4d6b; }
+        .org-head-title { font-size: 1.1rem; font-weight: 700; color: #1e4d6b; text-align: center; padding-bottom: 0.5rem; border-bottom: 2px solid #cbd5e1; margin-bottom: 0.8rem; }
+        .org-proyecto { background: white; border-radius: 12px; padding: 0.8rem; margin-bottom: 0.8rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .org-proyecto-nombre { font-weight: 600; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; flex-wrap: wrap; gap: 0.5rem; }
+        .org-progreso-bar { background: #e2e8f0; border-radius: 10px; height: 6px; width: 100%; margin: 0.5rem 0; overflow: hidden; }
+        .org-progreso-fill { background: #1e4d6b; height: 100%; width: 0%; border-radius: 10px; transition: width 0.3s; }
+        .org-proyecto-status { font-size: 0.6rem; padding: 0.2rem 0.5rem; border-radius: 20px; }
+        .org-proyecto-status.completado { background: #d1fae5; color: #065f46; }
+        .org-proyecto-status.progreso { background: #fed7aa; color: #9a3412; }
+        .org-proyecto-status.pendiente { background: #fee2e2; color: #991b1b; }
+        .org-note { margin-top: 2rem; padding: 1rem; background: #f8fafc; border-radius: 16px; text-align: center; font-size: 0.75rem; color: #6b7280; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-card { background: white; width: 90%; max-width: 550px; border-radius: 28px; padding: 1.5rem; }
+        .modal-card input, .modal-card select { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #dce5ef; border-radius: 16px; }
+        .save-toast { position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 8px 16px; border-radius: 40px; font-size: 0.75rem; opacity: 0; transition: opacity 0.3s; z-index: 1000; }
+        .save-toast.show { opacity: 1; }
+        footer { margin-top: 2rem; text-align: center; font-size: 0.65rem; color: #8aa1bc; }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-building"></i></div>
+            <div class="logo-text">
+                <h1>OFICINA TÉCNICA - HG</h1>
+                <div class="subtitle"><i class="fas fa-chart-line"></i> Seguimiento de Proyectos · ETOS con Estados y Fechas</div>
+            </div>
+        </div>
+        <div class="admin-control">
+            <div id="roleBadge" class="viewer-badge"><i class="fas fa-eye"></i> Visualización</div>
+            <button class="btn-admin" id="adminModeBtn"><i class="fas fa-lock"></i> Admin</button>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="proyectos"><i class="fas fa-tasks"></i> Proyectos</button>
+        <button class="tab-btn" data-tab="organigrama"><i class="fas fa-sitemap"></i> Organigrama</button>
+    </div>
+
+    <div id="tab-proyectos" class="tab-content active">
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-title">Total Proyectos</div><div class="stat-number" id="totalProjects">0</div></div>
+            <div class="stat-card"><div class="stat-title">En proceso</div><div class="stat-number" id="inProgressCount">0</div></div>
+            <div class="stat-card"><div class="stat-title">Completados</div><div class="stat-number" id="completedCount">0</div></div>
+            <div class="stat-card"><div class="stat-title">Sin Iniciar</div><div class="stat-number" id="pendingCount">0</div></div>
+            <div class="stat-card"><div class="stat-title">Total ETOS</div><div class="stat-number" id="totalLaminas">0</div></div>
+        </div>
+
+        <div class="actions-bar">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn-primary" id="newProjectBtn"><i class="fas fa-plus-circle"></i> Nuevo Proyecto</button>
+                <button class="btn-primary btn-success" id="exportCSVBtn"><i class="fas fa-download"></i> Exportar CSV</button>
+                <button class="btn-primary btn-warning" id="saveBackupBtn"><i class="fas fa-save"></i> Guardar Backup</button>
+                <button class="btn-primary btn-secondary" id="cargarBackupBtn"><i class="fas fa-upload"></i> Cargar Backup</button>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <div class="filter-group">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="progress">En proceso</button>
+                    <button class="filter-btn" data-filter="completed">Completados</button>
+                    <button class="filter-btn" data-filter="pending">Sin Iniciar</button>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar...">
+                </div>
+            </div>
+        </div>
+
+        <div class="projects-table">
+            <div class="project-header">
+                <span>Proyecto</span>
+                <span>Avance</span>
+                <span>Prioridad</span>
+                <span>HEAD</span>
+                <span>Estado</span>
+                <span>ETOS</span>
+                <span>Acciones</span>
+            </div>
+            <div id="projectsListContainer"></div>
+        </div>
+    </div>
+
+    <div id="tab-organigrama" class="tab-content">
+        <div class="organigrama-container" id="organigramaContainer"></div>
+    </div>
+
+    <footer><i class="fas fa-chart-line"></i> Cada ETOS tiene su propio estado y fecha de finalización para análisis temporal</footer>
+</div>
+
+<!-- Modales -->
+<div id="passwordModal" class="modal">
+    <div class="modal-card">
+        <i class="fas fa-shield-alt" style="font-size: 2rem; color: #1e4d6b;"></i>
+        <h3>Acceso Administrador</h3>
+        <input type="password" id="adminPassword" placeholder="Contraseña">
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 1rem;">
+            <button class="btn-secondary" id="cancelPasswordBtn">Cancelar</button>
+            <button class="btn-primary" id="submitPasswordBtn">Ingresar</button>
+        </div>
+        <p style="font-size:0.7rem; margin-top:1rem;">Contraseña: <strong>****</strong></p>
+    </div>
+</div>
+
+<div id="projectModal" class="modal">
+    <div class="modal-card">
+        <h3 id="modalTitle">📋 Proyecto</h3>
+        <input type="text" id="projectName" placeholder="Nombre del proyecto">
+        <input type="text" id="projectHead" placeholder="HEAD (Rossy/Pierina/Edgar/Andrea/Aaron)">
+        <input type="text" id="projectDibujantes" placeholder="Dibujantes (separar con /)">
+        <input type="date" id="fechaSolicitud">
+        <input type="date" id="fechaTentativa">
+        <input type="date" id="fechaReal">
+        <select id="prioridad">
+            <option value="1">Prioridad 1 (Alta)</option>
+            <option value="2" selected>Prioridad 2 (Media)</option>
+            <option value="3">Prioridad 3 (Baja)</option>
+        </select>
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn-secondary" id="closeModalBtn">Cancelar</button>
+            <button class="btn-primary" id="saveProjectBtn">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<div id="editLaminaModal" class="modal">
+    <div class="modal-card">
+        <h3>✏️ Editar ETOS</h3>
+        <input type="text" id="editLaminaNombre" placeholder="Nombre de la ETOS">
+        <input type="text" id="editLaminaResponsable" placeholder="Responsable">
+        <input type="date" id="editLaminaFechaTermino" placeholder="Fecha de término">
+        <select id="editLaminaEstado">
+            <option value="pendiente">Sin iniciar</option>
+            <option value="progreso">En proceso</option>
+            <option value="terminado">Terminado</option>
+        </select>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 1rem;">
+            <button class="btn-secondary" id="closeEditModalBtn">Cancelar</button>
+            <button class="btn-primary" id="saveEditLaminaBtn">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<input type="file" id="fileInput" accept=".json" style="display:none;">
+<div class="save-toast" id="saveToast">✅ Guardado</div>
+
+<script>
+    // DATOS DEL EXCEL
+    let projects = [
+        { id: 1, name: "ADOLFO", head: "ROSSY", tarea: "ACTUALIZACIONES", dibujantes: "TRACKING CASA GONZALO", cantEtos: 3, fechaSolicitud: "2026-04-27", fechaTentativa: "2026-04-29", fechaReal: "2026-04-29", prioridad: "2", observaciones: "", laminas: [] },
+        { id: 2, name: "HOTEL NHOW", head: "ANDREA", tarea: "MUEBLE DJ", dibujantes: "Micaela Valera", cantEtos: 1, fechaSolicitud: "2026-04-27", fechaTentativa: "2026-04-28", fechaReal: "2026-05-04", prioridad: "2", observaciones: "se tuvo en Stand-by hasta informacion del cliente.", laminas: [] },
+        { id: 3, name: "UNIV: LIMA", head: "ANDREA", tarea: "MUEBLES EMPOTRABLES", dibujantes: "Cesar Arones / Briyith Cublillas", cantEtos: 2, fechaSolicitud: "2026-04-28", fechaTentativa: "2026-04-30", fechaReal: "2026-04-30", prioridad: "2", observaciones: "", laminas: [] },
+        { id: 4, name: "PANELES MULTITOP", head: "PIERINA", tarea: "ACTUALIZACION DE MEDIDAS DE OBRA", dibujantes: "Cesar Arones", cantEtos: 1, fechaSolicitud: "2026-04-28", fechaTentativa: "2026-05-05", fechaReal: "", prioridad: "1", observaciones: "hubo demoras por el feedback del supervisor en obra", laminas: [] },
+        { id: 5, name: "HOW", head: "ROSSY", tarea: "MUEBLES NUEVOS", dibujantes: "Gian Carlo Ruiz", cantEtos: 2, fechaSolicitud: "2026-04-28", fechaTentativa: "2026-04-30", fechaReal: "2026-04-30", prioridad: "2", observaciones: "", laminas: [] },
+        { id: 6, name: "PARDO", head: "EDGAR", tarea: "COCINAS", dibujantes: "ANDREA GARCIA / ELLEN", cantEtos: 9, fechaSolicitud: "2026-04-20", fechaTentativa: "2026-04-29", fechaReal: "2026-05-05", prioridad: "1", observaciones: "", laminas: [] },
+        { id: 7, name: "PARDO", head: "EDGAR", tarea: "LAVANDERIAS", dibujantes: "ANDREA GARCIA", cantEtos: 10, fechaSolicitud: "2026-04-29", fechaTentativa: "2026-05-02", fechaReal: "2026-05-04", prioridad: "1", observaciones: "", laminas: [] },
+        { id: 8, name: "PARDO", head: "EDGAR", tarea: "BAÑOS", dibujantes: "GIOVANA", cantEtos: 20, fechaSolicitud: "2026-04-29", fechaTentativa: "2026-05-05", fechaReal: "", prioridad: "1", observaciones: "", laminas: [] },
+        { id: 9, name: "TAPESTRY 1", head: "ANDREA", tarea: "MUCKUP", dibujantes: "Tracking TAPESTRY", cantEtos: 5, fechaSolicitud: "2026-04-29", fechaTentativa: "2026-04-30", fechaReal: "2026-05-04", prioridad: "1", observaciones: "", laminas: [] },
+        { id: 10, name: "TAPESTRY 2", head: "ANDREA", tarea: "MUCKUP", dibujantes: "Tracking TAPESTRY", cantEtos: 2, fechaSolicitud: "2026-04-29", fechaTentativa: "2026-05-05", fechaReal: "", prioridad: "2", observaciones: "", laminas: [] },
+        { id: 11, name: "DOMUS", head: "ROSSY", tarea: "BOTELLERO", dibujantes: "Gian Carlo Ruiz", cantEtos: 1, fechaSolicitud: "2026-04-29", fechaTentativa: "2026-05-04", fechaReal: "2026-05-04", prioridad: "1", observaciones: "", laminas: [] },
+        { id: 12, name: "LAF", head: "AARON", tarea: "BAÑOS", dibujantes: "Mayly / Jazmin", cantEtos: 0, fechaSolicitud: "2026-04-29", fechaTentativa: "2026-05-05", fechaReal: "", prioridad: "1", observaciones: "", laminas: [] },
+        { id: 13, name: "LAF", head: "AARON", tarea: "COCINAS", dibujantes: "Mayly / Jazmin / Ellen", cantEtos: 8, fechaSolicitud: "2026-04-29", fechaTentativa: "2026-05-02", fechaReal: "", prioridad: "1", observaciones: "", laminas: [] },
+        { id: 14, name: "IBIS", head: "ANDREA", tarea: "MUEBLES ESPECIALES", dibujantes: "Gian Carlo Ruiz", cantEtos: 1, fechaSolicitud: "2026-04-30", fechaTentativa: "2026-05-06", fechaReal: "", prioridad: "2", observaciones: "PENDIENDTE DE INFORMACION DEL CARPINTERO", laminas: [] },
+        { id: 15, name: "MOXY", head: "ROSSY", tarea: "REPISA", dibujantes: "Gian Carlo Ruiz", cantEtos: 1, fechaSolicitud: "2026-04-30", fechaTentativa: "2026-05-05", fechaReal: "", prioridad: "2", observaciones: "", laminas: [] },
+        { id: 16, name: "LEGACY", head: "ROSSY", tarea: "CLOSETS", dibujantes: "Carlos Acha / Micaela Valera", cantEtos: 0, fechaSolicitud: "2026-05-04", fechaTentativa: "", fechaReal: "", prioridad: "2", observaciones: "", laminas: [] },
+        { id: 17, name: "LA CLINICA", head: "PIERINA", tarea: "MUEBLES VARIOS", dibujantes: "POR ASIGNAR", cantEtos: 300, fechaSolicitud: "", fechaTentativa: "", fechaReal: "", prioridad: "3", observaciones: "", laminas: [] },
+        { id: 18, name: "EDGE", head: "ROSSY", tarea: "COUNTER", dibujantes: "Cesar Arones", cantEtos: 1, fechaSolicitud: "2026-05-04", fechaTentativa: "2026-05-05", fechaReal: "", prioridad: "1", observaciones: "", laminas: [] },
+        { id: 19, name: "CHIQUIAN", head: "EDGAR", tarea: "CLOSETS", dibujantes: "AVANCE CENTRO DE SALUD CHIQUIAN", cantEtos: 50, fechaSolicitud: "2026-05-11", fechaTentativa: "2026-05-16", fechaReal: "", prioridad: "3", observaciones: "ENVIO DEL 80%", laminas: [] },
+        { id: 20, name: "NEXO TOWER", head: "ROSSY", tarea: "ACTUALIZACION DE PROPUESTA MESA", dibujantes: "Gian Carlo Ruiz", cantEtos: 1, fechaSolicitud: "2026-05-04", fechaTentativa: "2026-05-05", fechaReal: "", prioridad: "1", observaciones: "", laminas: [] },
+        { id: 21, name: "LAF", head: "EDGAR", tarea: "ACTUALIZACION DE CLOSETS", dibujantes: "JAZMIN SARZO", cantEtos: 0, fechaSolicitud: "2026-05-05", fechaTentativa: "2026-05-06", fechaReal: "2026-05-07", prioridad: "2", observaciones: "", laminas: [] },
+        { id: 22, name: "URBAN", head: "ROSSY", tarea: "MOBILIARIOS SUELTOS", dibujantes: "Cesar Arones", cantEtos: 0, fechaSolicitud: "2026-05-05", fechaTentativa: "", fechaReal: "", prioridad: "2", observaciones: "", laminas: [] },
+        { id: 23, name: "LAF", head: "EDGAR", tarea: "ACTUALIZACION DE CLOSETS, CAJONES", dibujantes: "JAZMIN SARZO", cantEtos: 0, fechaSolicitud: "2026-05-07", fechaTentativa: "2026-05-11", fechaReal: "", prioridad: "2", observaciones: "", laminas: [] },
+        { id: 24, name: "HoW", head: "ROSSY", tarea: "bases maquetas", dibujantes: "Gian Carlo Ruiz", cantEtos: 0, fechaSolicitud: "2026-05-07", fechaTentativa: "2026-05-08", fechaReal: "", prioridad: "1", observaciones: "", laminas: [] }
+    ];
+
+    // Generar ETOS con estados y fechas
+    projects.forEach(p => {
+        if (p.cantEtos > 0 && p.dibujantes) {
+            let responsables = p.dibujantes.split('/').map(r => r.trim());
+            for (let i = 1; i <= p.cantEtos; i++) {
+                let responsable = responsables[i % responsables.length] || p.dibujantes;
+                let estado = "pendiente";
+                let fechaTermino = "";
+                if (p.fechaReal && p.fechaReal !== "") {
+                    estado = "terminado";
+                    fechaTermino = p.fechaReal;
+                } else if (i <= 2) {
+                    estado = "progreso";
+                }
+                p.laminas.push({ 
+                    id: Date.now() + i + Math.random(), 
+                    nombre: `ETO ${i}: ${p.tarea}`, 
+                    estado: estado,
+                    fechaTermino: fechaTermino,
+                    responsable: responsable 
+                });
+            }
+        }
+    });
+
+    let isAdmin = false;
+    let currentFilter = "all";
+    let currentSearch = "";
+    let editingId = null;
+    let openDetailId = null;
+    let editLaminaData = { proyectoId: null, laminaId: null };
+    const ADMIN_PASSWORD = "admin123";
+
+    function actualizarEstadoProyecto(proyecto) {
+        if (!proyecto.laminas || proyecto.laminas.length === 0) {
+            proyecto.status = "pending";
+            proyecto.progreso = 0;
+            return;
+        }
+        const terminados = proyecto.laminas.filter(l => l.estado === "terminado").length;
+        const enProceso = proyecto.laminas.filter(l => l.estado === "progreso").length;
+        const total = proyecto.laminas.length;
+        const porcentaje = Math.round((terminados / total) * 100);
+        proyecto.progreso = porcentaje;
+        if (terminados === 0 && enProceso === 0) proyecto.status = "pending";
+        else if (terminados === total) proyecto.status = "completed";
+        else proyecto.status = "progress";
+    }
+
+    function actualizarTodosLosEstados() { projects.forEach(p => actualizarEstadoProyecto(p)); }
+
+    function saveToLocalStorage() { actualizarTodosLosEstados(); localStorage.setItem("hg_proyectos_final_v6", JSON.stringify(projects)); showToast(); render(); }
+    function loadFromLocalStorage() { const saved = localStorage.getItem("hg_proyectos_final_v6"); if (saved) { projects = JSON.parse(saved); } actualizarTodosLosEstados(); if (!saved) saveToLocalStorage(); }
+    function showToast() { const toast = document.getElementById("saveToast"); toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 1200); }
+
+    function getProgreso(proj) { return proj.progreso || 0; }
+
+    function updateStats() {
+        document.getElementById("totalProjects").innerText = projects.length;
+        document.getElementById("inProgressCount").innerText = projects.filter(p => p.status === "progress").length;
+        document.getElementById("completedCount").innerText = projects.filter(p => p.status === "completed").length;
+        document.getElementById("pendingCount").innerText = projects.filter(p => p.status === "pending").length;
+        document.getElementById("totalLaminas").innerText = projects.reduce((sum, p) => sum + (p.laminas?.length || 0), 0);
+    }
+
+    function formatFecha(f) { if (!f) return '-'; const p = f.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
+    function escapeHtml(str) { if (!str) return ""; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+
+    function renderOrganigrama() {
+        const heads = ["ROSSY", "PIERINA", "EDGAR", "ANDREA", "AARON"];
+        const container = document.getElementById("organigramaContainer");
+        let html = `<div class="org-title"><i class="fas fa-building"></i> PROYECTOS - OFICINA TÉCNICA</div>
+                    <div class="org-jefe"><div class="org-jefe-card"><i class="fas fa-user-tie"></i><h3>COORDINADOR OFICINA TÉCNICA</h3><p>Dis. Joel Abanto</p></div></div>
+                    <div class="org-heads-grid">`;
+        heads.forEach(head => {
+            const proyectosHead = projects.filter(p => p.head === head);
+            if (proyectosHead.length === 0) return;
+            html += `<div class="org-head-card"><div class="org-head-title"><i class="fas fa-user-circle"></i> ${head}</div>`;
+            proyectosHead.forEach(proj => {
+                const progreso = getProgreso(proj);
+                const statusText = proj.status === "completed" ? "Completado" : (proj.status === "progress" ? "En proceso" : "Sin iniciar");
+                const statusClass = proj.status === "completed" ? "completado" : (proj.status === "progress" ? "progreso" : "pendiente");
+                let dibujantesList = proj.dibujantes ? proj.dibujantes.split('/').map(d => d.trim()) : [];
+                html += `<div class="org-proyecto"><div class="org-proyecto-nombre"><span><i class="fas fa-folder"></i> ${proj.name}</span><span class="org-proyecto-status ${statusClass}">${statusText}</span></div>
+                        <div class="org-progreso-bar"><div class="org-progreso-fill" style="width: ${progreso}%;"></div></div>
+                        <div style="font-size:0.7rem; text-align:right;">${progreso}%</div>
+                        <div class="org-dibujantes">${dibujantesList.map(d => `<span class="org-dibujante-tag"><i class="fas fa-user"></i> ${d}</span>`).join('')}</div></div>`;
+            });
+            html += `</div>`;
+        });
+        html += `</div><div class="org-note"><i class="fas fa-chart-line"></i> Cada ETOS tiene su propio estado y fecha para análisis temporal</div>`;
+        container.innerHTML = html;
+    }
+
+    function renderLaminas(proj) {
+        if (!proj.laminas || proj.laminas.length === 0) return '<div style="padding:0.5rem 0; color:#8aa1bc;">Sin ETOS registradas</div>';
+        let html = `<table class="lamina-table">
+                        <thead>
+                            <tr><th>ETOS</th><th>Responsable</th><th>Estado</th><th>Fecha Término</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody>`;
+        proj.laminas.forEach((lam, idx) => {
+            const estadoText = lam.estado === "pendiente" ? "Sin iniciar" : (lam.estado === "progreso" ? "En proceso" : "Terminado");
+            const estadoClass = lam.estado;
+            html += `<tr>
+                        <td style="${lam.estado === 'terminado' ? 'text-decoration:line-through; color:#8aa1bc;' : ''}">${escapeHtml(lam.nombre)}</td>
+                        <td>${escapeHtml(lam.responsable)}</td>
+                        <td><span class="lamina-status ${estadoClass}">${estadoText}</span></td>
+                        <td>${lam.fechaTermino ? formatFecha(lam.fechaTermino) : '-'}</td>
+                        <td>
+                            ${isAdmin ? `<i class="fas fa-edit action-icon" onclick="event.stopPropagation(); openEditLaminaModal(${proj.id}, ${lam.id}, '${escapeHtml(lam.nombre)}', '${escapeHtml(lam.responsable)}', '${lam.estado}', '${lam.fechaTermino || ''}')" style="color:#f59e0b;"></i>` : ''}
+                            ${isAdmin ? `<i class="fas fa-trash-alt action-icon" onclick="event.stopPropagation(); deleteLamina(${proj.id}, ${idx})" style="color:#ef4444;"></i>` : ''}
+                        </td>
+                    </tr>`;
+        });
+        html += `</tbody></table>`;
+        return html;
+    }
+
+    function render() {
+        actualizarTodosLosEstados();
+        let filtered = [...projects];
+        if (currentFilter !== "all") filtered = filtered.filter(p => p.status === currentFilter);
+        if (currentSearch.trim()) filtered = filtered.filter(p => p.name.toLowerCase().includes(currentSearch.trim().toLowerCase()));
+        updateStats();
+        if (filtered.length === 0) { document.getElementById("projectsListContainer").innerHTML = `<div class="empty-row">No hay proyectos</div>`; renderOrganigrama(); return; }
+        let html = "";
+        filtered.forEach(proj => {
+            const progreso = getProgreso(proj);
+            const laminasTotal = proj.laminas?.length || 0;
+            const laminasComp = proj.laminas?.filter(l => l.estado === "terminado").length || 0;
+            const prioridadText = proj.prioridad === "1" ? "Alta" : (proj.prioridad === "2" ? "Media" : "Baja");
+            const statusText = proj.status === "progress" ? "En proceso" : (proj.status === "completed" ? "Completado" : "Sin iniciar");
+            const isOpen = (openDetailId === proj.id);
+            html += `<div class="project-row" onclick="toggleDetail(${proj.id})">
+                        <div><strong>${escapeHtml(proj.name)}</strong><br><span style="font-size:0.65rem; color:#6b7280;">${escapeHtml(proj.tarea || '')}</span></div>
+                        <div><div class="progress-bar-wrap"><div class="progress-fill" style="width: ${progreso}%;"></div></div><span style="font-size:0.6rem;">${progreso}%</span></div>
+                        <div><span class="priority-badge priority-${proj.prioridad}">${prioridadText}</span></div>
+                        <div><span style="font-size:0.75rem;">${escapeHtml(proj.head || '-')}</span></div>
+                        <div><span class="status-badge status-${proj.status}">${statusText}</span></div>
+                        <div><i class="fas fa-file-image"></i> ${laminasComp}/${laminasTotal}</div>
+                        <div onclick="event.stopPropagation()">
+                            ${isAdmin ? `<i class="fas fa-edit action-icon" onclick="editProject(${proj.id})" style="color:#1e4d6b;"></i> <i class="fas fa-trash-alt action-icon" onclick="deleteProject(${proj.id})" style="color:#ef4444;"></i>` : `<i class="fas fa-lock" style="color:#ccc;"></i>`}
+                        </div>
+                    </div>
+                    <div class="detail-row ${isOpen ? 'open' : ''}" id="detail-${proj.id}">
+                        <div class="detail-grid">
+                            <div><strong>📅 Solicitud:</strong> ${formatFecha(proj.fechaSolicitud)}</div>
+                            <div><strong>📅 Tentativa:</strong> ${formatFecha(proj.fechaTentativa)}</div>
+                            <div><strong>✅ Real:</strong> ${formatFecha(proj.fechaReal)}</div>
+                            <div><strong>👤 HEAD:</strong> ${escapeHtml(proj.head)}</div>
+                            <div><strong>✏️ Dibujantes:</strong> ${escapeHtml(proj.dibujantes)}</div>
+                            <div><strong>📝 Observación:</strong> ${escapeHtml(proj.observaciones) || '-'}</div>
+                        </div>
+                        <div><strong>📋 ETOS (${laminasComp}/${laminasTotal} terminadas):</strong></div>
+                        <div id="lamina-list-${proj.id}">${renderLaminas(proj)}</div>
+                        ${isAdmin ? `<button class="small-btn" onclick="addLamina(${proj.id})" style="margin-top:10px; background:#eef2ff; border:none; padding:5px 12px; border-radius:20px; cursor:pointer;"><i class="fas fa-plus"></i> Agregar ETOS</button>` : ''}
+                    </div>`;
+        });
+        document.getElementById("projectsListContainer").innerHTML = html;
+        renderOrganigrama();
+    }
+
+    window.toggleDetail = function(projId) { openDetailId = (openDetailId === projId) ? null : projId; render(); };
+    
+    window.deleteLamina = function(projId, idx) {
+        if (!isAdmin) return;
+        const p = projects.find(p => p.id === projId);
+        if (p && p.laminas) {
+            p.laminas.splice(idx, 1);
+            actualizarEstadoProyecto(p);
+            saveToLocalStorage();
+            render();
+        }
+    };
+
+    window.openEditLaminaModal = function(projId, laminaId, nombre, responsable, estado, fechaTermino) {
+        editLaminaData = { proyectoId: projId, laminaId: laminaId };
+        document.getElementById("editLaminaNombre").value = nombre;
+        document.getElementById("editLaminaResponsable").value = responsable;
+        document.getElementById("editLaminaFechaTermino").value = fechaTermino || "";
+        document.getElementById("editLaminaEstado").value = estado || "pendiente";
+        document.getElementById("editLaminaModal").style.display = "flex";
+    };
+
+    function saveEditLamina() {
+        const nuevoNombre = document.getElementById("editLaminaNombre").value.trim();
+        const nuevoResponsable = document.getElementById("editLaminaResponsable").value.trim();
+        const nuevaFecha = document.getElementById("editLaminaFechaTermino").value;
+        const nuevoEstado = document.getElementById("editLaminaEstado").value;
+        if (!nuevoNombre) { alert("El nombre es requerido"); return; }
+        const p = projects.find(p => p.id === editLaminaData.proyectoId);
+        if (p && p.laminas) {
+            const lamina = p.laminas.find(l => l.id === editLaminaData.laminaId);
+            if (lamina) {
+                lamina.nombre = nuevoNombre;
+                lamina.responsable = nuevoResponsable || "Sin asignar";
+                lamina.fechaTermino = nuevaFecha;
+                lamina.estado = nuevoEstado;
+                // Si la ETOS se marca como terminada, actualizar fecha automáticamente
+                if (nuevoEstado === "terminado" && !nuevaFecha) {
+                    lamina.fechaTermino = new Date().toISOString().split('T')[0];
+                }
+                actualizarEstadoProyecto(p);
+                saveToLocalStorage();
+                render();
+            }
+        }
+        document.getElementById("editLaminaModal").style.display = "none";
+        editLaminaData = { proyectoId: null, laminaId: null };
+    }
+
+    window.addLamina = function(projId) {
+        if (!isAdmin) return;
+        const nombre = prompt("Nombre de la ETOS:");
+        if (nombre) {
+            const responsable = prompt("Responsable:", "Ingeniero");
+            const p = projects.find(p => p.id === projId);
+            if (p) {
+                if (!p.laminas) p.laminas = [];
+                p.laminas.push({ 
+                    id: Date.now() + Math.random(), 
+                    nombre: nombre.trim(), 
+                    estado: "pendiente",
+                    fechaTermino: "",
+                    responsable: responsable?.trim() || "Sin asignar" 
+                });
+                actualizarEstadoProyecto(p);
+                saveToLocalStorage();
+                render();
+            }
+        }
+    };
+
+    window.editProject = function(id) { 
+        if (!isAdmin) return; 
+        const p = projects.find(p => p.id === id); 
+        if (p) { 
+            editingId = id; 
+            document.getElementById("modalTitle").innerText = "✏️ Editar Proyecto"; 
+            document.getElementById("projectName").value = p.name; 
+            document.getElementById("projectHead").value = p.head || ""; 
+            document.getElementById("projectDibujantes").value = p.dibujantes || ""; 
+            document.getElementById("fechaSolicitud").value = p.fechaSolicitud || ""; 
+            document.getElementById("fechaTentativa").value = p.fechaTentativa || ""; 
+            document.getElementById("fechaReal").value = p.fechaReal || ""; 
+            document.getElementById("prioridad").value = p.prioridad; 
+            document.getElementById("projectModal").style.display = "flex"; 
+        } 
+    };
+    
+    window.deleteProject = function(id) { 
+        if (!isAdmin) return; 
+        if (confirm("¿Eliminar este proyecto?")) { 
+            projects = projects.filter(p => p.id !== id); 
+            saveToLocalStorage(); 
+            render(); 
+        } 
+    };
+
+    function saveProject() {
+        if (!isAdmin) return;
+        const name = document.getElementById("projectName").value.trim();
+        if (!name) { alert("Nombre requerido"); return; }
+        if (editingId) {
+            const idx = projects.findIndex(p => p.id === editingId);
+            if (idx !== -1) {
+                projects[idx] = { ...projects[idx], name, head: document.getElementById("projectHead").value, dibujantes: document.getElementById("projectDibujantes").value, fechaSolicitud: document.getElementById("fechaSolicitud").value, fechaTentativa: document.getElementById("fechaTentativa").value, fechaReal: document.getElementById("fechaReal").value, prioridad: document.getElementById("prioridad").value };
+                actualizarEstadoProyecto(projects[idx]);
+            }
+        } else {
+            projects.push({ id: Date.now(), name, head: document.getElementById("projectHead").value, tarea: "", dibujantes: document.getElementById("projectDibujantes").value, cantEtos: 0, fechaSolicitud: document.getElementById("fechaSolicitud").value, fechaTentativa: document.getElementById("fechaTentativa").value, fechaReal: document.getElementById("fechaReal").value, prioridad: document.getElementById("prioridad").value, observaciones: "", laminas: [], status: "pending", progreso: 0 });
+        }
+        saveToLocalStorage();
+        render();
+        closeModal();
+    }
+
+    function closeModal() { document.getElementById("projectModal").style.display = "none"; editingId = null; }
+    function closeEditModal() { document.getElementById("editLaminaModal").style.display = "none"; editLaminaData = { proyectoId: null, laminaId: null }; }
+    function exportCSV() { 
+        let csv = "\uFEFFProyecto,HEAD,Dibujantes,Fecha Solicitud,Fecha Tentativa,Fecha Real,Prioridad,Estado,Progreso\n"; 
+        projects.forEach(p => { 
+            csv += `"${p.name}","${p.head || ''}","${p.dibujantes || ''}","${p.fechaSolicitud || ''}","${p.fechaTentativa || ''}","${p.fechaReal || ''}","${p.prioridad}","${p.status}","${p.progreso || 0}%"\n`; 
+        }); 
+        const blob = new Blob([csv], {type: "text/csv"}); 
+        const link = document.createElement("a"); 
+        link.href = URL.createObjectURL(blob); 
+        link.download = "proyectos_HG.csv"; 
+        link.click(); 
+    }
+    
+    function saveBackup() { const data = JSON.stringify(projects, null, 2); const blob = new Blob([data], {type: "application/json"}); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `backup_HG_${new Date().toISOString().split('T')[0]}.json`; link.click(); }
+    function cargarBackup() { document.getElementById('fileInput').click(); }
+    
+    document.getElementById('fileInput').addEventListener('change', function(e) { 
+        const file = e.target.files[0]; 
+        if (!file) return; 
+        const reader = new FileReader(); 
+        reader.onload = function(evt) { 
+            try { 
+                const datos = JSON.parse(evt.target.result); 
+                if (Array.isArray(datos)) { 
+                    projects = datos; 
+                    actualizarTodosLosEstados();
+                    saveToLocalStorage(); 
+                    render(); 
+                    alert("Backup cargado"); 
+                } else { 
+                    alert("Archivo no válido"); 
+                } 
+            } catch(err) { 
+                alert("Error"); 
+            } 
+        }; 
+        reader.readAsText(file); 
+    });
+
+    function enableAdmin() { isAdmin = true; document.getElementById("roleBadge").innerHTML = '<i class="fas fa-crown"></i> Administrador'; document.getElementById("roleBadge").className = "admin-badge"; render(); }
+    function disableAdmin() { isAdmin = false; openDetailId = null; document.getElementById("roleBadge").innerHTML = '<i class="fas fa-eye"></i> Visualización'; document.getElementById("roleBadge").className = "viewer-badge"; render(); }
+    function checkPassword() { const pwd = document.getElementById("adminPassword").value; if (pwd === ADMIN_PASSWORD) { enableAdmin(); document.getElementById("passwordModal").style.display = "none"; } else { alert("Contraseña incorrecta"); disableAdmin(); document.getElementById("passwordModal").style.display = "none"; } document.getElementById("adminPassword").value = ""; }
+
+    // Eventos
+    document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => { document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active")); btn.classList.add("active"); document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active")); document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active"); if (btn.dataset.tab === "organigrama") renderOrganigrama(); }));
+    document.getElementById("newProjectBtn").addEventListener("click", () => { if (!isAdmin) { alert("Modo visualización"); return; } editingId = null; document.getElementById("modalTitle").innerText = "📋 Nuevo Proyecto"; document.getElementById("projectName").value = ""; document.getElementById("projectHead").value = ""; document.getElementById("projectDibujantes").value = ""; document.getElementById("fechaSolicitud").value = ""; document.getElementById("fechaTentativa").value = ""; document.getElementById("fechaReal").value = ""; document.getElementById("prioridad").value = "2"; document.getElementById("projectModal").style.display = "flex"; });
+    document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+    document.getElementById("saveProjectBtn").addEventListener("click", saveProject);
+    document.getElementById("closeEditModalBtn").addEventListener("click", closeEditModal);
+    document.getElementById("saveEditLaminaBtn").addEventListener("click", saveEditLamina);
+    document.getElementById("adminModeBtn").addEventListener("click", () => document.getElementById("passwordModal").style.display = "flex");
+    document.getElementById("submitPasswordBtn").addEventListener("click", checkPassword);
+    document.getElementById("cancelPasswordBtn").addEventListener("click", () => document.getElementById("passwordModal").style.display = "none");
+    document.getElementById("exportCSVBtn").addEventListener("click", exportCSV);
+    document.getElementById("saveBackupBtn").addEventListener("click", saveBackup);
+    document.getElementById("cargarBackupBtn").addEventListener("click", cargarBackup);
+    document.querySelectorAll(".filter-btn").forEach(btn => btn.addEventListener("click", () => { document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active")); btn.classList.add("active"); currentFilter = btn.dataset.filter; render(); }));
+    document.getElementById("searchInput").addEventListener("input", (e) => { currentSearch = e.target.value; render(); });
+    window.onclick = (e) => { if (e.target === document.getElementById("projectModal")) closeModal(); if (e.target === document.getElementById("editLaminaModal")) closeEditModal(); if (e.target === document.getElementById("passwordModal")) document.getElementById("passwordModal").style.display = "none"; };
+
+    loadFromLocalStorage();
+    render();
+</script>
+</body>
+</html>
